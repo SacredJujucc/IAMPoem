@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I AM Poem Game</title>
+    <style>
+        body {
+            background-color: #1c1e29;
+            font-family: "Igiari", monospace;
+            font-weight: bold;
+            text-align: center;
+            color: #FFF;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .title-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .game-logo {
+            width: 400px;
+            height: 175px;
+            cursor: pointer;
+            background-image: url('assets/empty-hearts.png'); /* Change the image URL */
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        .game-title {
+            font-size: 70px;
+            color: #f00;
+	    user-select: none;
+            text-transform: uppercase;
+            letter-spacing: 10px;
+        }
+
+        .press-start {
+            font-size: 50px;
+            color: #f00;
+            cursor: pointer;
+            user-select: none;
+            margin-top: 20px;
+            text-transform: uppercase;
+            animation: flickerButton 3s ease infinite;
+        }
+      
+        .loading-screen {
+            font-size: 50px;
+	    user-select: none;
+        }
+
+       .poem-container {
+            text-align: left;
+            min-height: 450px;
+            display: none;
+
+        }
+
+        .poem {
+            background-color: #000;
+            padding: 30px;
+	    padding-left: 35px;
+            width: 950px;
+            border-radius: 20px;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            margin: 0 auto;
+            transform: translate(0%, 0%);
+        }
+
+        .line {
+            font-size: 32.5px;
+            margin: 20px;
+        }
+
+        .red-line {
+            color: red;
+        }
+
+        /* Main animation */
+        .animate-shake-fall {
+            animation: shake 0.5s ease-in-out forwards, fallMain 1s ease-in-out forwards 0.4s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translate(0%, 0) rotate(0deg); }
+            10%, 30%, 50%, 70%, 90% { transform: translate(0%, -15px) rotate(-2deg); }
+            20%, 40%, 60%, 80% { transform: translate(0%, -15px) rotate(2deg); }
+        }
+
+        @keyframes fallMain {
+            0% {
+                top: 20vh;
+                transform: translate(0%, -15px);
+            }
+            100% {
+                top: 100vh;
+                transform: translate(0%, 200vh) rotate(45deg);
+            }
+        }
+
+        .hide-poem {
+            display: none;
+        }
+
+        .game-over-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) !important;
+}
+
+        .game-over {
+            font-family: 'DFPMincho-UB', serif;
+            font-size: 80px;
+            color: #f00;
+            position: relative;
+            animation: revealText 1s ease forwards, fallGameOver 0.5s ease forwards;
+        }
+
+        @keyframes revealText {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        /* Game over animation */
+        @keyframes fallGameOver {
+            0% {
+                transform: translateY(-50px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        .play-again {
+            font-family: 'DFPMincho-UB', serif;
+            font-size: 50px;
+            color: #f00;
+            margin-top: 20px;
+            animation: revealText 1s ease forwards, fallGameOver 0.5s ease forwards;
+        }
+
+        .options {
+            font-family: 'DFPMincho-UB', serif;
+            font-size: 30px;
+            cursor: pointer;
+            user-select: none;
+            margin-top: 20px;
+            text-transform: uppercase;
+            animation: revealText 2s ease forwards, fallGameOver 1s ease forwards;
+        }
+
+        .yes-flicker {
+            animation: flickerButton 3s ease infinite 1.5s alternate;
+}
+
+        .no-flicker {
+            animation: flickerButton 3s ease infinite alternate;
+}
+        @keyframes flickerButton {
+            0%, 100% {
+                color: #f00;
+            }
+            50% {
+                color: #e8c8d6;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="title-screen" id="titleScreen">
+        <div class="game-logo" id="gameLogo"></div>
+        <div class="game-title">I AM poem</div>
+        <div class="press-start" id="pressStart">Press Start</div>
+    </div>
+
+    <div class="loading-screen" id="loadingScreen">
+    <div id="cursor"></div>
+
+    </div>
+
+    <div class="poem-container" id="poemContainer">
+        <div class="poem" id="stanza1">
+            <div class="line red-line" id="line1"></div>
+            <div class="line" id="line2"></div>
+            <div class="line" id="line3"></div>
+            <div class="line" id="line4"></div>
+            <div class="line" id="line5"></div>
+            <div class="line red-line" id="line6"></div>
+        </div>
+        <div class="poem" id="stanza2">
+            <div class="line" id="line7"></div>
+            <div class="line" id="line8"></div>
+            <div class="line" id="line9"></div>
+            <div class="line" id="line10"></div>
+            <div class="line" id="line11"></div>
+            <div class="line red-line" id="line12"></div>
+        </div>
+        <div class="poem" id="stanza3">
+            <div class="line" id="line13"></div>
+            <div class="line" id="line14"></div>
+            <div class="line" id="line15"></div>
+            <div class="line" id="line16"></div>
+            <div class="line" id="line17"></div>
+            <div class="line red-line" id="line18"></div>
+        </div>
+    </div>
+    <div class="game-over-container" id="gameOver">
+        <div class="game-over">GAME OVER</div>
+        <div class="play-again" id="playAgain">Play Again?</div>
+        <div class="options" id="yesno">
+            <span id="yes" class="yes-flicker">Yes</span>
+            <span> / </span>
+            <span id="no" class="no-flicker">No</span>
+        </div>
+    </div>
+
+<script>
+let currentImage = 1;
+let gameStarted = false;
+
+// Check for the query parameter
+const urlParams = new URLSearchParams(window.location.search);
+const reloadGame = urlParams.get('reload');
+
+// If 'reload' is true, skip the title screen
+if (reloadGame === 'true') {
+    initializeGame();
+
+    // Remove the 'reload' query parameter to reset the state
+    const url = new URL(window.location.href);
+    url.searchParams.delete('reload');
+    window.history.replaceState({}, document.title, url);
+}
+
+// Check sessionStorage for the reload flag
+const reloadFlag = sessionStorage.getItem('reloadFlag');
+
+// If the flag is set, clear it and proceed with the reload
+if (reloadFlag) {
+    sessionStorage.removeItem('reloadFlag');
+    initializeGame();
+}
+
+// Define the 'images' array
+const images = ['assets/three-hearts.png', 'assets/empty-hearts.png', 'assets/one-heart.png', 'assets/two-hearts.png'];
+
+// Function to hide all poem containers
+function hideAllStanzas() {
+    const stanzas = ["stanza1", "stanza2", "stanza3"];
+    stanzas.forEach(stanza => {
+        document.getElementById(stanza).style.display = "none";
+    });
+}
+
+// Function to reset styles
+function resetStyles() {
+    const elementsToReset = ["stanza1", "stanza2", "stanza3", "poemContainer", "gameOver"];
+    elementsToReset.forEach(elementId => {
+        const element = document.getElementById(elementId);
+        element.style.transform = 'none';
+        element.style.display = 'none';
+    });
+}
+
+document.getElementById("gameLogo").addEventListener("click", function () {
+    currentImage = (currentImage + 1) % images.length;
+    document.getElementById("gameLogo").style.backgroundImage = `url('${images[currentImage]}')`;
+});
+
+document.getElementById("pressStart").addEventListener("click", function () {
+    console.log("pressed start");
+    resetStyles();
+    titleScreen.style.display = "none"; // Hide the title screen
+    initializeGame();
+});
+
+function addCharacters(text, element, delay, callback) {
+    let i = 0
+
+    function addNextCharacter() {
+        if (i < text.length) {
+            // Add the next character
+            element.innerHTML += text[i];
+            i++;
+
+            setTimeout(addNextCharacter, delay);
+        } else {
+            if (callback) {
+                setTimeout(callback, 1000); // Wait 1 second after completing
+            }
+        }
+    }
+
+    addNextCharacter();
+}
+
+
+// Function to move the cursor to the end of the text
+function moveCursorToEnd(element) {
+    const cursor = document.getElementById('cursor');
+    element.appendChild(cursor);
+}
+
+
+// Function to display a stanza
+function displayStanza(stanzaId) {
+    const stanzas = ["stanza1", "stanza2", "stanza3"];
+    stanzas.forEach(stanza => {
+        document.getElementById(stanza).style.display = "none";
+    });
+    document.getElementById(stanzaId).style.display = "block";
+}
+
+function initializeGame() {
+    resetStyles();
+    const titleScreen = document.getElementById("titleScreen");
+
+    // Hide the title screen if reloading the game
+    if (!gameStarted) {
+        titleScreen.style.display = "none";
+    }
+
+    document.getElementById("loadingScreen").style.display = "block";
+
+    // Add your initialization logic here
+    addCharacters("I AM Poem loading...", document.getElementById("loadingScreen"), 100, function () {
+        document.getElementById("loadingScreen").innerHTML = "";
+        addCharacters("Please wait...", document.getElementById("loadingScreen"), 100, function () {
+            document.getElementById("loadingScreen").style.display = "none";
+            hideAllStanzas();
+            displayStanza("stanza1");
+            document.getElementById("poemContainer").style.display = "block";
+            if (!gameStarted) {
+                addStanza1();
+            }
+        });
+    });
+}
+
+
+document.getElementById("no").addEventListener("click", function () {
+    console.log("no clicked");
+    location.reload();
+});
+
+document.getElementById("yes").addEventListener("click", function () {
+    console.log("yes clicked");
+    gameStarted = true;
+    const titleScreen = document.getElementById("titleScreen");
+    titleScreen.style.display = "none"; // Hide the title screen element
+    sessionStorage.setItem('reloadFlag', 'true');
+    window.location.href = window.location.href;
+});
+
+    // Add characters for the first stanza
+    function addStanza1() {
+        addCharacters("I am tired of trying, yet I’m still praying for a miracle.", document.getElementById("line1"), 40, function () {
+            addCharacters("I wonder why others decide one’s future before they have the chance to live their present.", document.getElementById("line2"), 40, function () {
+                addCharacters("I hear these broken records playing empty words, “It won’t be like this forever. It gets better.”", document.getElementById("line3"), 40, function () {
+                    addCharacters("I see the effect of long-term manipulation and mourn the peace that could have been.", document.getElementById("line4"), 40, function () {
+                        addCharacters("I want to wake up and find that my reality was only a nightmare.", document.getElementById("line5"), 40, function () {
+                            addCharacters("I am tired of trying, yet I’m still praying for a miracle.", document.getElementById("line6"), 40, function () {
+                                // After the first stanza is done, add the class to make the poem container shake and fall
+                                document.getElementById("stanza1").classList.add("animate-shake-fall");
+                                // After the animation, hide the poem container
+                                setTimeout(function () {
+                                    document.getElementById("poemContainer").classList.add("hide-poem");
+                                    // Add characters for the second stanza
+                                    setTimeout(function () {
+                                        addStanza2();
+                                    }, 0500); // 1.5-second delay after the first stanza
+                                }, 1000); // 1-second duration of animation
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    }
+
+    // Add characters for the second stanza
+    function addStanza2() {
+        displayStanza("stanza2");
+        addCharacters("I pretend that I am who I am not, as “me” never was and has never been.", document.getElementById("line7"), 40, function () {
+            addCharacters("I feel driven into a corner, locked in an impenetrable prison.", document.getElementById("line8"), 40, function () {
+                addCharacters("I touch the dark circles under my eyes, thinking, “Raccoons do it better”.", document.getElementById("line9"), 40, function () {
+                    addCharacters("I worry when I cannot forget, forced to relive the scenes I had tried to escape.", document.getElementById("line10"), 40, function () {
+                        addCharacters("I cry when I fall for the lies that get my hopes up, just for them to plummet.", document.getElementById("line11"), 40, function () {
+                            addCharacters("I am tired of trying, yet still praying for a miracle.", document.getElementById("line12"), 40, function () {
+                                // After the second stanza is done, add the class to make the poem container shake and fall
+                                document.getElementById("stanza2").classList.add("animate-shake-fall");
+                                // After the animation, hide the poem container
+                                setTimeout(function () {
+                                    document.getElementById("poemContainer").classList.add("hide-poem");
+                                    // Add characters for the third stanza
+                                    setTimeout(function () {
+                                        addStanza3();
+                                    }, 0500); // 1.5-second delay after the second stanza
+                                }, 1000); // 1 second duration of animation
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    }
+
+    // Add characters for the third stanza
+    function addStanza3() {
+        displayStanza("stanza3");
+        addCharacters("I understand this is out of my control.", document.getElementById("line13"), 40, function () {
+            addCharacters("I say, “It’s alright,” and “I’ll be okay.”", document.getElementById("line14"), 40, function () {
+                addCharacters("I dream about another me who might have been raised in a household with love and peace.", document.getElementById("line15"), 40, function () {
+                    addCharacters("I try my hardest nonetheless, for whatever reason, despite wanting to give up.", document.getElementById("line16"), 40, function () {
+                        addCharacters("I hope that I will get a break without any strings attached, not just postpone the inevitable stress that is to come.", document.getElementById("line17"), 40, function () {
+                            addCharacters("I am tired of trying, yet still praying for a miracle.", document.getElementById("line18"), 40, function () {
+                                // After the third stanza is done, add the class to make the poem container shake and fall
+                                document.getElementById("stanza3").classList.add("animate-shake-fall");
+                                // After the animation, hide the poem container
+                                setTimeout(function () {
+                                    document.getElementById("poemContainer").classList.add("hide-poem");
+
+                                    // Display the game over screen after hiding the poem container
+                                    setTimeout(function () {
+                                        document.getElementById("gameOver").style.display = "flex";
+                                    }, 0500); // 1.5-second duration of hiding the poem container
+                                }, 1000); // 1 second duration of animation
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    }
+</script>
+
+</body>
+
+</html>
