@@ -30,7 +30,7 @@
             width: 400px;
             height: 175px;
             cursor: pointer;
-            background-image: url('assets/empty-hearts.png'); /* Change the image URL */
+            background-image: url('assets/empty-hearts.png');
             background-size: contain;
             background-repeat: no-repeat;
         }
@@ -289,7 +289,7 @@ document.getElementById("gameLogo").addEventListener("click", function () {
 document.getElementById("pressStart").addEventListener("click", function () {
     console.log("pressed start");
     resetStyles();
-    titleScreen.style.display = "none"; // Hide the title screen
+    titleScreen.style.display = "none";
     initializeGame();
 });
 
